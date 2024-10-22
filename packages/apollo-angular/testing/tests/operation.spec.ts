@@ -9,6 +9,13 @@ const testQuery = gql`
     }
   }
 `;
+const testSubscription = gql`
+  subscription newHeroes {
+    heroes {
+      name
+    }
+  }
+`;
 
 describe('TestOperation', () => {
   let mock: ApolloTestingBackend;
@@ -51,5 +58,42 @@ describe('TestOperation', () => {
     mock.expectOne(testQuery).flushData({
       heroes: [],
     });
+  });
+
+  test('should close the operation except for subscription', done => {
+    const operation = buildOperationForLink(testSubscription, {});
+    const emittedResults: any[] = [];
+
+    execute(link, operation as any).subscribe({
+      next(result: any) {
+        emittedResults.push(result);
+      },
+      complete() {
+        expect(emittedResults).toEqual([
+          {
+            data: {
+              heroes: ['first Hero'],
+            },
+          },
+          {
+            data: {
+              heroes: ['second Hero'],
+            },
+          },
+        ]);
+        done();
+      },
+    });
+
+    const testOperation = mock.expectOne(testSubscription);
+
+    testOperation.flushData({
+      heroes: ['first Hero'],
+    });
+
+    testOperation.flushData({
+      heroes: ['second Hero'],
+    });
+    testOperation.complete();
   });
 });

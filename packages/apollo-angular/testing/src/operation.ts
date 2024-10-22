@@ -1,6 +1,8 @@
-import { ExecutionResult, GraphQLError } from 'graphql';
+import { ExecutionResult, GraphQLError, Kind, OperationTypeNode } from 'graphql';
+import type { FragmentDefinitionNode, OperationDefinitionNode } from 'graphql/index';
 import { Observer } from 'rxjs';
 import { ApolloError, FetchResult, Operation as LinkOperation } from '@apollo/client/core';
+import { getMainDefinition } from '@apollo/client/utilities';
 
 const isApolloError = (err: any): err is ApolloError => err && err.hasOwnProperty('graphQLErrors');
 
@@ -9,10 +11,14 @@ export type Operation = LinkOperation & {
 };
 
 export class TestOperation<T = { [key: string]: any }> {
+  private readonly definition: OperationDefinitionNode | FragmentDefinitionNode;
+
   constructor(
     public readonly operation: Operation,
     private readonly observer: Observer<FetchResult<T>>,
-  ) {}
+  ) {
+    this.definition = getMainDefinition(this.operation.query);
+  }
 
   public flush(result: ExecutionResult | ApolloError): void {
     if (isApolloError(result)) {
@@ -20,8 +26,18 @@ export class TestOperation<T = { [key: string]: any }> {
     } else {
       const fetchResult = result ? { ...result } : result;
       this.observer.next(fetchResult as any);
-      this.observer.complete();
+
+      if (
+        this.definition.kind === Kind.OPERATION_DEFINITION &&
+        this.definition.operation !== OperationTypeNode.SUBSCRIPTION
+      ) {
+        this.complete();
+      }
     }
+  }
+
+  public complete() {
+    this.observer.complete();
   }
 
   public flushData(data: { [key: string]: any } | null): void {
