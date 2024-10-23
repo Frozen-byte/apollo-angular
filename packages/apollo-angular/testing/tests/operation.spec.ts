@@ -1,4 +1,4 @@
-import { ApolloLink, execute, gql } from '@apollo/client/core';
+import { ApolloLink, execute, FetchResult, gql } from '@apollo/client/core';
 import { ApolloTestingBackend } from '../src/backend';
 import { buildOperationForLink } from './utils';
 
@@ -62,10 +62,10 @@ describe('TestOperation', () => {
 
   test('should close the operation except for subscription', done => {
     const operation = buildOperationForLink(testSubscription, {});
-    const emittedResults: any[] = [];
+    const emittedResults: FetchResult[] = [];
 
-    execute(link, operation as any).subscribe({
-      next(result: any) {
+    execute(link, operation).subscribe({
+      next(result) {
         emittedResults.push(result);
       },
       complete() {
