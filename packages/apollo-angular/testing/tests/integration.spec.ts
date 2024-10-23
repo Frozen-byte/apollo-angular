@@ -42,11 +42,11 @@ describe('Integration', () => {
 
     // query
     apollo.query<any>(op).subscribe({
-      next: (result: any) => {
+      next: result => {
         expect(result.data).toMatchObject(data);
         done();
       },
-      error: (e: any) => {
+      error: e => {
         done.fail(e);
       },
     });
@@ -75,11 +75,11 @@ describe('Integration', () => {
 
     // query
     apollo.query<any>(op).subscribe({
-      next: (result: any) => {
+      next: result => {
         expect(result.data).toMatchObject(data);
         done();
       },
-      error: (e: any) => {
+      error: e => {
         done.fail(e);
       },
     });
@@ -108,11 +108,11 @@ describe('Integration', () => {
 
     // query
     apollo.query<any>(op).subscribe({
-      next: (result: any) => {
+      next: result => {
         expect(result.data).toMatchObject(data);
         done();
       },
-      error: (e: any) => {
+      error: e => {
         done.fail(e);
       },
     });
@@ -144,11 +144,11 @@ describe('Integration', () => {
 
     // query
     apollo.query<any>(op).subscribe({
-      next: (result: any) => {
+      next: result => {
         expect(result.data).toMatchObject(data);
         done();
       },
-      error: (e: any) => {
+      error: e => {
         done.fail(e);
       },
     });
@@ -176,8 +176,8 @@ describe('Integration', () => {
       ],
     });
 
-    const apollo: Apollo = TestBed.get(Apollo);
-    const backend: ApolloTestingController = TestBed.get(ApolloTestingController);
+    const apollo = TestBed.inject(Apollo);
+    const backend = TestBed.inject(ApolloTestingController);
 
     const query = gql`
       {
@@ -204,7 +204,7 @@ describe('Integration', () => {
     };
 
     apollo.query<any>(op).subscribe({
-      next: (result: any) => {
+      next: result => {
         expect(result.data).toMatchObject(data);
         done();
       },

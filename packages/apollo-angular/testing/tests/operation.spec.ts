@@ -34,7 +34,7 @@ describe('TestOperation', () => {
   test('accepts a null body', done => {
     const operation = buildOperationForLink(testQuery, {});
 
-    execute(link, operation as any).subscribe((result: any) => {
+    execute(link, operation).subscribe(result => {
       expect(result).toBeNull();
       done();
     });
@@ -45,7 +45,7 @@ describe('TestOperation', () => {
   test('should accepts data for flush operation', done => {
     const operation = buildOperationForLink(testQuery, {});
 
-    execute(link, operation as any).subscribe((result: any) => {
+    execute(link, operation).subscribe(result => {
       expect(result).toEqual({
         data: {
           heroes: [],
